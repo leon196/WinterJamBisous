@@ -1,0 +1,63 @@
+#pragma kernel ComputeInit
+#pragma kernel ComputeBoid
+#include "UnityCG.cginc"
+#include "Utils.cginc"
+
+uniform RWTexture2D<float4> _BoidBuffer;
+uniform float _TimeElapsed, _Dimension;
+uniform float _BoidRadius, _BoidFollowRange;
+uniform float _VelocitySpeed, _VelocityFriction, _VelocityDamping, _VelocityMax;
+uniform float _VelocityAvoid, _VelocityFollow, _VelocityGravity, _VelocityCamera;
+
+[numthreads(8,8,1)]
+void ComputeInit (uint3 id : SV_DispatchThreadID)
+{
+	float2 index = id.xy/_Dimension;
+	_BoidBuffer[id.xy] = float4(
+		index.x*2.-1.,
+		index.y*2.-1.,
+		rand(index),
+		rand(index+float2(4653.43,9840.)));
+}
+
+[numthreads(8,8,1)]
+void ComputeBoid (uint3 id : SV_DispatchThreadID)
+{
+	float epsilon = 0.0001;
+	float2 position = _BoidBuffer[id.xy].xy;
+	float2 velocity = _BoidBuffer[id.xy].zw;
+	float2 target = float2(0,0);
+	float2 offset = float2(0,epsilon);
+	float2 gravity = normalize(target-position+epsilon);
+	float2 avoid = float2(0,0);
+	float2 follow = float2(0,0);
+
+	float radius = _BoidRadius;
+
+	float2 index = id.xy/_Dimension;
+	for (int x = 0; x < _Dimension; ++x) {
+		for (int y = 0; y < _Dimension; ++y) {
+			float2 other = _BoidBuffer[float2(x,y)].xy;
+			float2 otherVelocity = _BoidBuffer[float2(x,y)].zw;
+			float dist = length(other - position);
+			float2 dir = (position - other);
+			float isOther = step(epsilon, length(float2(x,y)-id.xy));
+			
+			float collision = 1.-smoothstep(radius*2., radius*10., dist);
+			avoid += isOther * normalize(dir+epsilon) * max(length(dir), radius*2.) * collision;
+
+			float following = 1. - smoothstep(0., _BoidFollowRange, dist);
+			follow += isOther * otherVelocity * following;
+		}
+	}
+
+	offset += avoid * _VelocityAvoid;
+	offset += follow * _VelocityFollow;
+	offset += gravity * _VelocityGravity;
+	offset = normalize(offset) * min(length(offset), _VelocityMax);
+	offset *= _VelocitySpeed;
+	velocity *= _VelocityFriction;
+	velocity = lerp(velocity+epsilon, velocity+offset, _VelocityDamping);
+	position += velocity;
+	_BoidBuffer[id.xy] = float4(position, velocity);
+}

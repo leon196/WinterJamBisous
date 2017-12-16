@@ -41,6 +41,7 @@ public class Buddy {
 		gameObject.transform.localPosition = pos;
 
 		body = Geometry.GetQuad("Body", materialBody, gameObject.transform);
+		GameObject.Destroy(body.GetComponent<Collider>());
 		head = Geometry.GetQuad("Head", materialHead, gameObject.transform);
 
 		size = UnityEngine.Random.Range(.5f,.9f);

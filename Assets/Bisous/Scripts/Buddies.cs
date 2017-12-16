@@ -144,8 +144,11 @@ public class Buddies : MonoBehaviour {
 	}
 
 	public void CreateBuddies () {
-		foreach (Texture2D texture in headTextures) {
-			CreateBuddy(texture);
+		// foreach (Texture2D texture in headTextures) {
+		// 	CreateBuddy(texture);
+		// }
+		for (int i = 0; i < 100; ++i) {
+			CreateBuddy(headTextures[(int)UnityEngine.Random.Range(0,headTextures.Count)]);
 		}
 	}
 
