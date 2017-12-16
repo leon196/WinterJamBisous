@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Buddies : MonoBehaviour {
 
@@ -14,13 +15,21 @@ public class Buddies : MonoBehaviour {
 	public Texture kissTexture;
 
 	[Header("Boid Area")]
-	public float followRange = 1f;
+	public float followRange = 3f;
 
 	[Header("Boid Velocity")]
 	public float velocitySpeed = .1f;
 	public float velocityFriction = .9f;
 	public float velocityDamping = .1f;
 	public float velocityMax = 1f;
+
+    public bool playing = false;
+    public GameObject startButton;
+    public GameObject startImage;
+    public Text countText;
+
+    private int countKiss = 0;
+
 
 	private List<Buddy> buddyList;
 	private List<Texture2D> headTextures;
@@ -51,19 +60,36 @@ public class Buddies : MonoBehaviour {
 		buddyList = new List<Buddy>();
 		mouseClick = 0f;
 		Fetch();
-	}
-	
-	void Update () {
+
+        InvokeRepeating("Direction", 0, 3);
+        InvokeRepeating("RetourZero", 0, 21);
+    }
+
+    public void Playing()
+    {
+        playing = true;
+        startButton.SetActive(false);
+        startImage.SetActive(false);
+
+    }
+
+    void Update () {
 
 		float mouseDelta = 0f;
-		if (Input.GetMouseButton(0)) mouseDelta = Mathf.Clamp01(mouseDelta + 5f);
+		if (Input.GetMouseButton(0) && playing) mouseDelta = Mathf.Clamp01(mouseDelta + 5f);
 
-		if (Input.GetMouseButtonDown(0)) {
+		if (Input.GetMouseButtonDown(0) && playing) {
 			ray = cameraComponent.ScreenPointToRay(Input.mousePosition);
 			if (Physics.Raycast(ray, out raycast, 100f)) {
 				GameObject other = raycast.collider.gameObject;
 				if (other.transform.parent.parent == transform) {
+                    if(other.transform.parent.GetComponent<BuddyBehaviour>().buddy.kissed == false)
+                    {
+                        ++countKiss;
+                        countText.text = countKiss + "/" + buddyList.Count;
+                    }
 					other.transform.parent.GetComponent<BuddyBehaviour>().buddy.Kiss();
+                    
 				}
 			}
 		}
@@ -77,7 +103,7 @@ public class Buddies : MonoBehaviour {
 
 			Vector2 velocity = new Vector2(0,0);
 
-			Vector2 target = (Vector2.zero - buddy.position).normalized;
+			Vector2 target = (buddy.targetDir - buddy.position).normalized;
 
 			Vector2 avoid = new Vector2(0,0);
 			Vector2 follow = new Vector2(0,0);
@@ -101,7 +127,9 @@ public class Buddies : MonoBehaviour {
 			buddy.velocity = Vector2.Lerp(buddy.velocity * velocityFriction, velocity, velocityDamping);
 			buddy.position += buddy.velocity * velocitySpeed;
 
-			buddy.Update();
+            
+            buddy.Update();
+
 		}	
 	}
 
@@ -155,4 +183,28 @@ public class Buddies : MonoBehaviour {
 			CreateBuddies();
 		}
 	}
+
+    public void Direction()
+    {
+        //Debug.Log("Bonjour direction");
+
+        foreach (Buddy buddy in buddyList)
+        {
+            buddy.targetDir = new Vector2(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-2f, 1f));
+            buddy.followScale = UnityEngine.Random.Range(.6f, .8f)*(buddy.targetDir.x * buddy.targetDir.x + buddy.targetDir.y * buddy.targetDir.y);
+        }
+
+    }
+
+    public void RetourZero()
+    {
+        Debug.Log("Bonjour direction");
+
+        foreach (Buddy buddy in buddyList)
+        {
+            buddy.targetDir = Vector2.zero;
+            buddy.followScale = UnityEngine.Random.Range(.6f, .8f);
+        }
+
+    }
 }

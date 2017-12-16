@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ public class Buddy {
 	public float avoidScale;
 	public float targetScale;
 	public float followScale;
+	public Vector2 targetDir;
 	public Vector2 position;
 	public Vector2 velocity;
 	public float ground;
@@ -45,6 +47,7 @@ public class Buddy {
 		avoidScale = 3f;//UnityEngine.Random.Range(.6f,.8f);
 		targetScale = UnityEngine.Random.Range(.6f,.8f);
 		followScale = UnityEngine.Random.Range(.6f,.8f);
+		targetDir = Vector2.zero;
 
 		ground = size * 6f;
 
@@ -53,6 +56,7 @@ public class Buddy {
 		materials = new Material[] { materialBody, materialHead };
 
 		kissed = false;
+
 	}
 
 	public void Update () {
@@ -89,4 +93,6 @@ public class Buddy {
 			material.SetVector(name, value);
 		}
 	}
+
+	
 }
