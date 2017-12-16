@@ -17,11 +17,11 @@
 			
 			#include "UnityCG.cginc"
 			
-			sampler2D _MainTex, _BoidBuffer;
+			sampler2D _MainTex, _BoidBuffer, _InfoBuffer;
 
 			fixed4 frag (v2f_img i) : SV_Target
 			{
-				fixed4 col = tex2D(_BoidBuffer, i.uv);
+				fixed4 col = tex2D(_InfoBuffer, i.uv);
 				return col;
 			}
 			ENDCG

@@ -112,6 +112,57 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &351550083
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 351550087}
+  - component: {fileID: 351550086}
+  - component: {fileID: 351550085}
+  m_Layer: 0
+  m_Name: Plane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!64 &351550085
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 351550083}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!33 &351550086
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 351550083}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &351550087
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 351550083}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1287657047
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,8 +302,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1625101536}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0.43531826, y: 0.30992836, z: -0.16266076, w: -0.82944804}
+  m_LocalPosition: {x: 2.496519, y: 4.9171886, z: -2.970562}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -298,18 +349,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c6266c0ebf136141908331536c1fd7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dimension: 128
-  spriteShader: {fileID: 4800000, guid: 303b17b208d09524ba60fadad22a3892, type: 3}
+  dimension: 32
+  bodyShader: {fileID: 4800000, guid: 303b17b208d09524ba60fadad22a3892, type: 3}
+  headShader: {fileID: 4800000, guid: 46e4e9287153d58468728a86bc1ab920, type: 3}
   computeShader: {fileID: 7200000, guid: 827fe844fcb8f984f9d9f248441f8545, type: 3}
+  cameraComponent: {fileID: 1625101539}
   boidRadius: 0.1
-  boidFollowRange: 1.6
+  boidFollowRange: 1
   velocityAvoid: 2
   velocityFollow: 1
   velocityGravity: 1
   velocitySpeed: 0.1
   velocityFriction: 0.9
   velocityDamping: 0.1
-  velocityMax: 3
+  velocityMax: 1
 --- !u!4 &1722151369
 Transform:
   m_ObjectHideFlags: 0
@@ -335,3 +388,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loaded: 0
+  bodyAtlas: {fileID: 0}
+  headAtlas: {fileID: 0}

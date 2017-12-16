@@ -9,8 +9,8 @@ public class Fetch : MonoBehaviour
 {
 	[HideInInspector] public bool loaded;
 
-	private Texture2D bodyAtlas;
-	private Texture2D headAtlas;
+	public Texture2D bodyAtlas;
+	public Texture2D headAtlas;
 	private List<Texture2D> headTextures;
 	private List<Texture2D> bodyTextures;
 	private string[] fileHeadPaths;
@@ -21,7 +21,7 @@ public class Fetch : MonoBehaviour
 	private Rect[] bodyRects;
 	private Rect[] headRects;
 
-	void Start()
+	void Awake()
 	{
 		dataHeadPath = Application.dataPath;
 		List<string> paths = new List<string>(dataHeadPath.Split('/'));
@@ -60,21 +60,22 @@ public class Fetch : MonoBehaviour
 		}
 	}
 
-	IEnumerator Load(string url, List<Texture2D> list)
-	{
-		WWW www = new WWW(url);
-		yield return www;
-		list.Add(www.texture);
-		if (headTextures.Count + bodyTextures.Count == total) {
+	void Update () {
+		if (loaded == false && headTextures.Count + bodyTextures.Count == total) {
 			int dimension = 2048;
 			bodyAtlas = new Texture2D(dimension, dimension);
 			headAtlas = new Texture2D(dimension, dimension);
 			bodyRects = bodyAtlas.PackTextures(bodyTextures.ToArray(), 2, dimension);
 			headRects = headAtlas.PackTextures(headTextures.ToArray(), 2, dimension);
 			loaded = true;
-			Shader.SetGlobalTexture("_BodyAtlas", bodyAtlas);
-			Shader.SetGlobalTexture("_HeadAtlas", headAtlas);
 		}
+	}
+
+	IEnumerator Load(string url, List<Texture2D> list)
+	{
+		WWW www = new WWW(url);
+		yield return www;
+		list.Add(www.texture);
 	}
 
 	public Vector4 GetRandomBodyFrame () {

@@ -75,11 +75,11 @@ public class Buddy {
 	}
 
 	public void Kiss () {
-		jumpDelta += 10f;
+		jumpDelta += 5f;
 		float strengh = 10f;
 		Vector2 impulse = new Vector2(UnityEngine.Random.Range(-strengh,strengh), UnityEngine.Random.Range(-strengh,strengh));
 		// impulse = impulse.normalized * strengh;
-		velocity += impulse;
+		// velocity += impulse;
 		kissed = true;
 	}
 

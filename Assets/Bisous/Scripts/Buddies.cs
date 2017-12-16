@@ -101,7 +101,7 @@ public class Buddies : MonoBehaviour
             foreach (Buddy other in buddyList)
             {
                 float dist = Vector2.Distance(buddy.position, other.position);
-                float radius = buddy.size + other.size;
+                float radius = buddy.size + other.size + (buddy.jumpDelta + other.jumpDelta) * 2f;
                 Vector2 dir = buddy.position - other.position;
                 if (dist < radius && dist > 0.0001f)
                 {

@@ -5,8 +5,10 @@ using UnityEngine;
 public class BuddiesGPU : MonoBehaviour {
 
 	public int dimension = 32;
-	public Shader spriteShader;
+	public Shader bodyShader;
+	public Shader headShader;
 	public ComputeShader computeShader;
+	public Camera cameraComponent;
 	[Header("Boid Radius")]
 	public float boidRadius = .5f;
 	public float boidFollowRange = 1f;
@@ -22,22 +24,42 @@ public class BuddiesGPU : MonoBehaviour {
 
 	private int kernel;
 	private RenderTexture boidBuffer;
+	private RenderTexture infoBuffer;
 	private bool generated;
 	private Fetch fetch;
+	private RaycastHit raycast;
+	private Ray ray;
 
 	void Start () {
 		kernel = computeShader.FindKernel("ComputeInit");
 		boidBuffer = GetComputeTexture();
+		infoBuffer = GetComputeTexture();
 		computeShader.SetTexture(kernel, "_BoidBuffer", boidBuffer);
+		computeShader.SetTexture(kernel, "_InfoBuffer", infoBuffer);
 		computeShader.Dispatch(kernel, dimension/8, dimension/8, 1);
 		kernel = computeShader.FindKernel("ComputeBoid");
 		computeShader.SetTexture(kernel, "_BoidBuffer", boidBuffer);
+		computeShader.SetTexture(kernel, "_InfoBuffer", infoBuffer);
 		generated = false;
 		fetch = GetComponent<Fetch>();
 	}
+
+	void OnDrawGizmos () {
+		Gizmos.DrawLine(raycast.point, raycast.point+Vector3.up);
+	}
 	
 	void Update () {
+
 		if (generated) {
+
+			computeShader.SetVector("_HitPoint", Vector3.one*10000f);
+			// if (Input.GetMouseButtonDown(0)) {
+				ray = cameraComponent.ScreenPointToRay(Input.mousePosition);
+				if (Physics.Raycast(ray, out raycast, 100f)) {
+					computeShader.SetVector("_HitPoint", raycast.point);
+				}
+			// }
+
 			computeShader.SetFloat("_Dimension", dimension);
 			computeShader.SetFloat("_BoidRadius", boidRadius);
 			computeShader.SetFloat("_BoidFollowRange", boidFollowRange);
@@ -49,13 +71,20 @@ public class BuddiesGPU : MonoBehaviour {
 			computeShader.SetFloat("_VelocityFriction", velocityFriction);
 			computeShader.SetFloat("_VelocityDamping", velocityDamping);
 			computeShader.Dispatch(kernel, dimension/8, dimension/8, 1);
+
 			Shader.SetGlobalTexture("_BoidBuffer", boidBuffer);
+			Shader.SetGlobalTexture("_InfoBuffer", infoBuffer);
 		} else {
 			if (fetch.loaded) {
 				generated = true;
-				Material material = new Material(spriteShader);
-				Mesh[] meshes = Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
-				SetupBodyFrame(meshes);
+				Material material = new Material(bodyShader);
+				material.mainTexture = fetch.bodyAtlas;
+				Mesh[] bodyMeshes = Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
+				material = new Material(headShader);
+				material.mainTexture = fetch.headAtlas;
+				Mesh[] headMeshes = Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
+				SetupBodyFrame(bodyMeshes);
+				SetupHeadFrame(headMeshes);
 			}
 		}
 	}
