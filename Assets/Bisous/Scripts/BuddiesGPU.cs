@@ -22,32 +22,42 @@ public class BuddiesGPU : MonoBehaviour {
 
 	private int kernel;
 	private RenderTexture boidBuffer;
+	private bool generated;
+	private Fetch fetch;
 
 	void Start () {
 		kernel = computeShader.FindKernel("ComputeInit");
 		boidBuffer = GetComputeTexture();
 		computeShader.SetTexture(kernel, "_BoidBuffer", boidBuffer);
 		computeShader.Dispatch(kernel, dimension/8, dimension/8, 1);
-
 		kernel = computeShader.FindKernel("ComputeBoid");
 		computeShader.SetTexture(kernel, "_BoidBuffer", boidBuffer);
-
-		Material material = new Material(spriteShader);
-		Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
+		generated = false;
+		fetch = GetComponent<Fetch>();
 	}
 	
 	void Update () {
-		computeShader.SetFloat("_Dimension", dimension);
-		computeShader.SetFloat("_BoidRadius", boidRadius);
-		computeShader.SetFloat("_VelocityAvoid", velocityAvoid);
-		computeShader.SetFloat("_VelocityFollow", velocityFollow);
-		computeShader.SetFloat("_VelocityGravity", velocityGravity);
-		computeShader.SetFloat("_VelocityMax", velocityMax);
-		computeShader.SetFloat("_VelocitySpeed", velocitySpeed);
-		computeShader.SetFloat("_VelocityFriction", velocityFriction);
-		computeShader.SetFloat("_VelocityDamping", velocityDamping);
-		computeShader.Dispatch(kernel, dimension/8, dimension/8, 1);
-		Shader.SetGlobalTexture("_BoidBuffer", boidBuffer);
+		if (generated) {
+			computeShader.SetFloat("_Dimension", dimension);
+			computeShader.SetFloat("_BoidRadius", boidRadius);
+			computeShader.SetFloat("_BoidFollowRange", boidFollowRange);
+			computeShader.SetFloat("_VelocityAvoid", velocityAvoid);
+			computeShader.SetFloat("_VelocityFollow", velocityFollow);
+			computeShader.SetFloat("_VelocityGravity", velocityGravity);
+			computeShader.SetFloat("_VelocityMax", velocityMax);
+			computeShader.SetFloat("_VelocitySpeed", velocitySpeed);
+			computeShader.SetFloat("_VelocityFriction", velocityFriction);
+			computeShader.SetFloat("_VelocityDamping", velocityDamping);
+			computeShader.Dispatch(kernel, dimension/8, dimension/8, 1);
+			Shader.SetGlobalTexture("_BoidBuffer", boidBuffer);
+		} else {
+			if (fetch.loaded) {
+				generated = true;
+				Material material = new Material(spriteShader);
+				Mesh[] meshes = Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
+				SetupBodyFrame(meshes);
+			}
+		}
 	}
 
 	RenderTexture GetComputeTexture () {
@@ -56,5 +66,33 @@ public class BuddiesGPU : MonoBehaviour {
 		texture.enableRandomWrite = true;
 		texture.Create();
 		return texture;
+	}
+
+	void SetupHeadFrame (Mesh[] meshes) {
+		foreach (Mesh mesh in meshes) {
+			Vector3[] vertices = mesh.vertices;
+			Vector4[] frames = new Vector4[vertices.Length];
+			for (int i = 0; i+3 < vertices.Length; i += 4) {
+				Vector4 frame = fetch.GetRandomHeadFrame();
+				for (int v = 0; v < 4; ++v) {
+					frames[i+v] = frame;
+				}
+			}
+			mesh.tangents = frames;
+		}
+	}
+
+	void SetupBodyFrame (Mesh[] meshes) {
+		foreach (Mesh mesh in meshes) {
+			Vector3[] vertices = mesh.vertices;
+			Vector4[] frames = new Vector4[vertices.Length];
+			for (int i = 0; i+3 < vertices.Length; i += 4) {
+				Vector4 frame = fetch.GetRandomBodyFrame();
+				for (int v = 0; v < 4; ++v) {
+					frames[i+v] = frame;
+				}
+			}
+			mesh.tangents = frames;
+		}
 	}
 }

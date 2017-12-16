@@ -17,7 +17,7 @@ public class Geometry {
 		return meshGameObject;
 	}
 
-	static public void GenerateMeshes (Transform root, Material material, int dimension, float sliceX = 1f, float sliceY = 1f)
+	static public Mesh[] GenerateMeshes (Transform root, Material material, int dimension, float sliceX = 1f, float sliceY = 1f)
 	{
 		Vector2 slices = new Vector2(sliceX, sliceY);
 		Vector2 faces = new Vector2(slices.x+1f, slices.y+1f);
@@ -26,6 +26,7 @@ public class Geometry {
 		int totalVertices = total * vertexCount;
 		int verticesMax = 65000;
 		int meshCount = 1 + (int)Mathf.Floor(totalVertices / verticesMax);
+		Mesh[] meshes = new Mesh[meshCount];
 		int mapIndex = 0;
 		for (int m = 0; m < meshCount; ++m)
 		{
@@ -89,6 +90,8 @@ public class Geometry {
 			mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 1000f);
 
 			filter.mesh = mesh;
+			meshes[m] = mesh;
 		}
+		return meshes;
 	}
 }

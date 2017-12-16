@@ -279,6 +279,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1722151369}
   - component: {fileID: 1722151368}
+  - component: {fileID: 1722151370}
   m_Layer: 0
   m_Name: Boids
   m_TagString: Untagged
@@ -297,11 +298,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c6266c0ebf136141908331536c1fd7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dimension: 64
+  dimension: 128
   spriteShader: {fileID: 4800000, guid: 303b17b208d09524ba60fadad22a3892, type: 3}
   computeShader: {fileID: 7200000, guid: 827fe844fcb8f984f9d9f248441f8545, type: 3}
   boidRadius: 0.1
-  boidFollowRange: 1
+  boidFollowRange: 1.6
   velocityAvoid: 2
   velocityFollow: 1
   velocityGravity: 1
@@ -322,3 +323,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1722151370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1722151367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42c1e8a47fa5363489a2ea33e1c7f14a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loaded: 0
