@@ -55,6 +55,19 @@ Shader "Unlit/Body"
 
 				float2 anchor = v.uv*2.-1.;
 				anchor.y *= -1.;
+
+				float salt = rand(_Seed) * PI * 2.;
+				float time = _Time.y * 8.+salt;
+
+				// uv.y = 1.-uv.y;
+				// uv.x -= .5;
+				float breathX = 1. + .2 * cos(time);
+				float breathY = 1. + .1 * sin(time);
+				anchor.x *= breathX;
+				anchor.y *= breathY;
+				// uv.x += .5;
+				// uv.y = 1.-uv.y;
+
 				float3 view = position-_WorldSpaceCameraPos;
 				view.y = 0;
 				view = normalize(view);
@@ -64,7 +77,7 @@ Shader "Unlit/Body"
 
 				float size = _Size * 2.;
 				position.xyz += (direction * anchor.y + right * anchor.x) * size;
-				position.y -= _Size * 3.;
+				position.y -= _Size * 2.5;
 
 				// o.position = UnityObjectToClipPos(position);
 				o.position = mul(UNITY_MATRIX_VP, position);
@@ -74,30 +87,19 @@ Shader "Unlit/Body"
 			
 			fixed4 frag (varying i) : SV_Target
 			{
-				float salt = rand(_Seed) * PI * 2.;
-				float time = _Time.y * 8.+salt;
 
 				float2 p = i.uv;
 				p -= .5;
 				rotation2D(p, sin(p.y*5.+_Time.y*5.)*.2 * (1.-i.uv.y));
 				p += .5;
 
-				float2 uv = p;
-				uv.y = 1.-uv.y;
-				uv.x -= .5;
-				float breathX = 1. + .2 * cos(time);
-				float breathY = 1. + .1 * sin(time);
-				uv.x *= breathX;
-				uv.y *= breathY;
-				uv.x += .5;
-				uv.y = 1.-uv.y;
-				fixed4 col = tex2D(_MainTex, uv);
+				fixed4 col = tex2D(_MainTex, p);
 
-				float shouldClip = col.a - .1;
-				shouldClip -= step(0.,abs(uv.x-.5)-.5);
-				shouldClip -= step(0.,abs(uv.y-.5)-.5);
+				float shouldClip = col.a - .5;
+				shouldClip -= step(0.,abs(p.x-.5)-.5);
+				shouldClip -= step(0.,abs(p.y-.5)-.5);
 				clip(shouldClip);
-				col.rgb *= uv.y*.5+.5;
+				col.rgb *= p.y*.5+.5;
 				return col;
 			}
 			ENDCG
