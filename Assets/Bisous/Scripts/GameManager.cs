@@ -1,16 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
-    public bool playing = false;
+    [NonSerialized]public bool playing = false;
     public GameObject startButton;
     public GameObject startImage;
     public GameObject restartButton;
     public Text messageFin;
     public Text countText;
+    public GameObject particule;
+    public AudioSource bruitBisous;
 
     private int countKiss = 0;
 
@@ -27,6 +28,15 @@ public class GameManager : MonoBehaviour {
         if (countKiss == GetComponent<Buddies>().buddyList.Count && countKiss != 0)
         {
             EndGame();
+        }
+
+        if (Input.GetMouseButtonDown(0) && playing)
+        {
+            Instantiate(particule);
+
+            int soundIndex = UnityEngine.Random.Range(0, GetComponent<FetchSound>().bruitages.Count);
+            bruitBisous.clip = GetComponent<FetchSound>().bruitages[soundIndex];
+            bruitBisous.Play();
         }
     }
 
@@ -50,7 +60,7 @@ public class GameManager : MonoBehaviour {
         restartButton.SetActive(true);
         countKiss = 0;
 
-        messageFin.text = "TU ES GÉNIAL, TU AS GAGNÉ !";
+        messageFin.text = "TU ES GÉNIAL-E, TU AS GAGNÉ !";
 
     }
 
