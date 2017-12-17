@@ -60,8 +60,12 @@ public class Fetch : MonoBehaviour
 		}
 	}
 
-	void Update () {
-		if (loaded == false && headTextures.Count + bodyTextures.Count == total) {
+	IEnumerator Load(string url, List<Texture2D> list)
+	{
+		WWW www = new WWW(url);
+		yield return www;
+		list.Add(www.texture);
+		if (headTextures.Count + bodyTextures.Count == total) {
 			int dimension = 2048;
 			bodyAtlas = new Texture2D(dimension, dimension);
 			headAtlas = new Texture2D(dimension, dimension);
@@ -69,13 +73,6 @@ public class Fetch : MonoBehaviour
 			headRects = headAtlas.PackTextures(headTextures.ToArray(), 2, dimension);
 			loaded = true;
 		}
-	}
-
-	IEnumerator Load(string url, List<Texture2D> list)
-	{
-		WWW www = new WWW(url);
-		yield return www;
-		list.Add(www.texture);
 	}
 
 	public Vector4 GetRandomBodyFrame () {
