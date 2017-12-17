@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour {
         restartButton.SetActive(true);
         countKiss = 0;
 
-        messageFin.text = "Vous êtes génial, vous avez gagné !";
+        messageFin.text = "TU ES GÉNIAL, TU AS GAGNÉ !";
 
     }
 
