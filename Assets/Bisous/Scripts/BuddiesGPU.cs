@@ -5,6 +5,7 @@ using UnityEngine;
 public class BuddiesGPU : MonoBehaviour {
 
 	public int dimension = 32;
+	public Shader boidShader;
 	public Shader bodyShader;
 	public Shader headShader;
 	public ComputeShader computeShader;
@@ -40,8 +41,11 @@ public class BuddiesGPU : MonoBehaviour {
 		kernel = computeShader.FindKernel("ComputeBoid");
 		computeShader.SetTexture(kernel, "_BoidBuffer", boidBuffer);
 		computeShader.SetTexture(kernel, "_InfoBuffer", infoBuffer);
-		generated = false;
-		fetch = GetComponent<Fetch>();
+		// generated = false;
+		// fetch = GetComponent<Fetch>();
+		Material material = new Material(boidShader);
+		Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
+		generated = true;
 	}
 
 	void OnDrawGizmos () {
@@ -75,17 +79,17 @@ public class BuddiesGPU : MonoBehaviour {
 			Shader.SetGlobalTexture("_BoidBuffer", boidBuffer);
 			Shader.SetGlobalTexture("_InfoBuffer", infoBuffer);
 		} else {
-			if (fetch.loaded) {
-				generated = true;
-				Material material = new Material(bodyShader);
-				material.mainTexture = fetch.bodyAtlas;
-				Mesh[] bodyMeshes = Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
-				material = new Material(headShader);
-				material.mainTexture = fetch.headAtlas;
-				Mesh[] headMeshes = Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
-				SetupBodyFrame(bodyMeshes);
-				SetupHeadFrame(headMeshes);
-			}
+			// if (fetch.loaded) {
+				// generated = true;
+				// Material material = new Material(bodyShader);
+				// material.mainTexture = fetch.bodyAtlas;
+				// Mesh[] bodyMeshes = Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
+				// material = new Material(headShader);
+				// material.mainTexture = fetch.headAtlas;
+				// Mesh[] headMeshes = Geometry.GenerateMeshes(transform, material, dimension, 1f, 1f);
+				// SetupBodyFrame(bodyMeshes);
+				// SetupHeadFrame(headMeshes);
+			// }
 		}
 	}
 
